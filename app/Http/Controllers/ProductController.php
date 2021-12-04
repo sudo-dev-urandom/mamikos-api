@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\BaseController as BaseController;
 use App\Http\Resources\Product as ProductResource;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -117,13 +118,23 @@ class ProductController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function checkAvailibility($id, $id_users, Product $product)
+    public function check($id, $id_users, Product $product)
     {
         $product = Product::where('available', 1)->where('id', $id);
+        $users_points = DB::table('users')
+            ->where('id', $id_users)
+            ->get();
+        $update_points = DB::table('users')
+            ->where('id', $id_users)
+            ->update(
+                [
+                    'points' => $users_points[0]->points - 10,
+                ]
+            );
         if (is_null($product)) {
-            return $this->sendResponse('Product not Avail.');
+            return $this->sendResponse([],'Product not Avail.');
         } else {
-            return $this->sendResponse(new ProductResource($product), 'Product Avail');
+            return $this->sendResponse([], 'Product Avail');
         }
     }
 }
