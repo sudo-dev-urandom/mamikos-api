@@ -30,6 +30,13 @@ class UserController extends BaseController
         }
 
         $input = $request->all();
+         // generate points
+        $input['points'] = 0;
+        if ($input['role'] == "user" ){
+            $input['points'] = 20;
+        }elseif ($input['role'] == "premium_user" ){
+            $input['points'] = 40;
+        }
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
         $success['token'] = $user->createToken('mamikos-app')->accessToken;
